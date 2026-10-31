@@ -34,11 +34,12 @@ Si se desea usar otro puerto o credenciales, copiar `.env.example` como `.env` y
 
 ## Despliegue en AWS
 
-La imagen de la aplicación se publica en GitHub Container Registry. Para desplegarla en una instancia EC2 con Docker y Docker Compose, clonar este repositorio, configurar `IMAGE_NAME=ghcr.io/miguel-acd/el3304-lab5-pregunta1-java:1.0` y ejecutar:
+La imagen de la aplicación está publicada en GitHub Container Registry con la etiqueta `1.0`. Para desplegar sin credenciales del registro, se puede clonar este repositorio en una instancia EC2 con Docker y Docker Compose y compilar desde el código público:
 
 ```bash
-docker compose pull
-docker compose up -d --no-build
+git clone https://github.com/Miguel-ACD/el3304-lab5-pregunta1-java.git
+cd el3304-lab5-pregunta1-java
+docker compose up -d --build
 ```
 
-La instancia necesita permitir tráfico entrante al puerto 8000. El servicio `source` usa el archivo JSON incluido en el repositorio y PostgreSQL guarda sus datos en el volumen `postgres_data`. Tras verificar la aplicación por la IP pública, detener o terminar la instancia para evitar mantener recursos activos.
+La instancia necesita permitir tráfico entrante al puerto 8000. El servicio `source` usa el archivo JSON incluido en el repositorio y PostgreSQL guarda sus datos en el volumen `postgres_data`. Tras verificar la aplicación por la IP pública, detener o terminar la instancia para evitar mantener recursos activos. El paquete del registro puede mantenerse privado; el repositorio público basta para reproducir el despliegue.
