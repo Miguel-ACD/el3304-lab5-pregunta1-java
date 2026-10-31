@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#13342e">
+  <title>Predicciones Champions League</title>
+  <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span class="brand-name">Predicciones Champions League</span>
+      <a href="#registrar" class="header-action">Crear predicción <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">Cada partido tiene<br><em>un resultado posible.</em></h1>
+        <p>Consulta los encuentros, registra tu marcador y revisa todas las predicciones en un mismo lugar.</p>
+      </div>
+      <div class="intro-side">
+        <strong th:text="${#lists.size(matches)}">3</strong>
+        <span>partidos disponibles</span>
+      </div>
+    </section>
+
+    <div th:if="${message}" class="notice notice-ok" role="status" th:text="${message}">Predicción guardada.</div>
+    <div th:if="${error}" class="notice notice-error" role="alert" th:text="${error}">Revisa los datos.</div>
+
+    <section class="section" aria-labelledby="matches-title">
+      <div class="section-heading">
+        <div><h2 id="matches-title">Próximos partidos</h2><p>Encuentros disponibles para pronosticar.</p></div>
+        <span class="section-meta">Champions League</span>
+      </div>
+      <div class="match-list">
+        <article class="match-row" th:each="match : ${matches}">
+          <div class="match-date"><span th:text="${match.playedAt}">2026-11-03 20:00 UTC</span></div>
+          <div class="match-teams">
+            <strong th:text="${match.home}">Real Madrid</strong>
+            <span class="versus">vs</span>
+            <strong th:text="${match.away}">Manchester City</strong>
+          </div>
+          <a href="#registrar" class="match-link">Pronosticar <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="form-panel" id="registrar">
+        <div class="section-heading"><div><h2>Registrar predicción</h2><p>Elige un partido y escribe el marcador que esperas.</p></div></div>
+        <form action="/predicciones" method="post">
+          <label for="matchId">Partido</label>
+          <select id="matchId" name="matchId" required>
+            <option th:each="match : ${matches}" th:value="${match.id}"
+              th:text="${match.home + ' vs ' + match.away}">Real Madrid vs Manchester City</option>
+          </select>
+          <div class="score-fields">
+            <div><label for="homeGoals">Goles local</label><input id="homeGoals" name="homeGoals" type="number" min="0" max="20" inputmode="numeric" placeholder="0" required></div>
+            <span class="score-separator" aria-hidden="true">:</span>
+            <div><label for="awayGoals">Goles visitante</label><input id="awayGoals" name="awayGoals" type="number" min="0" max="20" inputmode="numeric" placeholder="0" required></div>
+          </div>
+          <button type="submit">Guardar predicción <span aria-hidden="true">→</span></button>
+        </form>
+      </div>
+
+      <div class="history-panel" aria-labelledby="history-title">
+        <div class="section-heading"><div><h2 id="history-title">Predicciones registradas</h2><p>Resultados guardados en la base de datos.</p></div></div>
+        <p class="empty" th:if="${#lists.isEmpty(predictions)}">Todavía no hay predicciones. Registra la primera para verla aquí.</p>
+        <div class="prediction-list" th:unless="${#lists.isEmpty(predictions)}">
+          <article class="prediction" th:each="p : ${predictions}">
+            <div><strong th:text="${p.home + ' · ' + p.away}">Real Madrid · Manchester City</strong><span th:text="${'Resultado: ' + p.outcome}">Resultado: Real Madrid</span></div>
+            <b th:text="${p.homeGoals + ' – ' + p.awayGoals}">2 – 1</b>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">Laboratorio 5 · Aplicación en Java</footer>
+</body>
+</html>

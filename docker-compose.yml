@@ -1,0 +1,35 @@
+services:
+  web:
+    build: .
+    image: ${IMAGE_NAME:-lab5-java-p1:local}
+    ports:
+      - "${APP_PORT:-8000}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-champions}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-lab5}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-lab5local}
+      MATCHES_API_URL: http://source/matches.json
+    depends_on:
+      db:
+        condition: service_healthy
+      source:
+        condition: service_started
+    restart: unless-stopped
+  source:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./source/matches.json:/usr/share/nginx/html/matches.json:ro
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-champions}
+      POSTGRES_USER: ${POSTGRES_USER:-lab5}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lab5local}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lab5} -d ${POSTGRES_DB:-champions}"]
+      interval: 3s
+      retries: 20
+volumes:
+  postgres_data:
